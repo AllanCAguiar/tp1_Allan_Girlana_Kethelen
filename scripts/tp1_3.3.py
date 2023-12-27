@@ -91,7 +91,7 @@ def queryB(cur, asin):
                     ''', (asin, asin,))
         similar=cur.fetchall()
         if(len(similar)==0):
-            print("\nNenhum produto similar mais vendido\n")
+            print("\nNenhum produto similar mais vendido ou não se sabe a posição de vendas do produto\n")
             return
         print("\nProdutos similares mais vendidos:")
         for i in similar:
@@ -108,8 +108,8 @@ def queryC(cur, asin):
     try:
         cur.execute('''SELECT * FROM ProductsReviews WHERE ASIN = %s;''', (asin,))
         queries = cur.fetchall()
-        if(len(queries)<=1):
-            print("\nProduto com menos de duas avaliações\n")
+        if(len(queries)<1):
+            print("\nProduto com nehuma avaliação\n")
             return
         '''
         for line in queries:
@@ -125,7 +125,7 @@ def queryC(cur, asin):
         plt.title("Média de Avaliação do Produto")
         plt.show()
         '''    
-        
+        print("Evolução da média de avaliação:")
         for line in queries: 
             print(line[2], end=' | ')
             sum+=line[3]
@@ -171,7 +171,7 @@ def queryD(cur):
         for row in results:
             table.add_row(row)
 
-        print("Os 10 produtos líderes de venda em cada grupo de produtos \n")
+        print("Os 10 produtos líderes de venda em cada grupo de produtos: \n")
         print(table)
         print('\n\n')
 
@@ -181,14 +181,14 @@ def queryD(cur):
 def queryE(cur):
     try:
         cur.execute('''
-                    SELECT ASIN, AVG(helpful) AS average_helpful
-                    FROM ProductsReviews
+                    SELECT ASIN, avg(rating) as average_rating
+                    FROM ProductsReviews WHERE helpful >= (votes/2) AND rating >=3
                     GROUP BY ASIN
-                    ORDER BY average_helpful DESC LIMIT 10;
+                    ORDER BY average_rating DESC LIMIT 10;
                 ''')
         results = cur.fetchall()
         table = PrettyTable()
-        table.field_names=['ASIN', 'average_helpful']
+        table.field_names=['ASIN', 'average_rating']
         for row in results:
             table.add_row(row)
 
@@ -198,6 +198,7 @@ def queryE(cur):
 
     except (Exception, psycopg2.DatabaseError) as error:
         print("Erro ao tentar realizar a consulta E", error)
+    
     
 
 def queryF():

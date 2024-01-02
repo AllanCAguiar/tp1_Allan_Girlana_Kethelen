@@ -47,13 +47,13 @@ def createTables():
         )
 
         cur.execute('''CREATE TABLE IF NOT EXISTS ProductsReviews (
+                    reviewID SERIAL PRIMARY KEY,
                     ASIN CHAR(10),
                     customer VARCHAR(20), 
                     date DATE,
                     rating INT,
                     votes INT,
                     helpful INT,
-                    PRIMARY KEY (ASIN, customer), 
                     FOREIGN KEY (ASIN) REFERENCES Products(ASIN));'''
         )
         conn.commit()
@@ -88,7 +88,7 @@ def insertProducts(cur, ID, ASIN, title, group_name, salesrank):
     
 def insertProductsReviews(cur, ASIN, costumer, date, rating, votes, helpful):
     try:
-        cur.execute("INSERT INTO ProductsReviews(ASIN, customer, date, rating, votes, helpful) VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT (ASIN, customer) DO NOTHING;", 
+        cur.execute("INSERT INTO ProductsReviews(ASIN, customer, date, rating, votes, helpful) VALUES (%s, %s, %s, %s, %s, %s);", 
                 (ASIN, costumer, date, rating, votes, helpful,))
     except (Exception, psycopg2.DatabaseError) as error:
         print("Erro ao tentar inserir na tabela ProductsReviews", error)
@@ -117,7 +117,7 @@ def readFile():
     print("Conexão com o PostgreSQL efetivada")
     similares = []
     print('Lendo arquivo de entrada...')
-    
+    cont=0
     with open(inputFile) as f:
         #Pula o cabeçario
         f.readline()
@@ -127,8 +127,6 @@ def readFile():
             #Ler ID
             line = line.split()
             ID = line[1]
-            #if(int(ID)%10000==0):
-            #    print(ID)
             #Ler ASIN
             line = f.readline().split()
             ASIN = line[1]
@@ -139,6 +137,7 @@ def readFile():
                 ASIN = ''
                 f.readline()
             else:
+                #print(ASIN)
                 line = line[1:]
                 title=' '.join(line)
                 #Ler grupo
@@ -167,8 +166,11 @@ def readFile():
                 #Ler avaliações
                 line = f.readline().split()
                 for i in range(int(line[4])):
+                    #cont+=1
                     review = f.readline().split()
                     insertProductsReviews(cur, ASIN, review[2], review[0], review[4], review[6], review[8])
+                #print(cont)
+                cont=0
                 f.readline()
     f.close()
     print("Leitura Concluida")

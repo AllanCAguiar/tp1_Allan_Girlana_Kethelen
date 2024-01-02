@@ -24,7 +24,7 @@ def queryA(cur, asin):
                         WHERE asin = '{asin}'
                         ORDER BY  helpful DESC, rating DESC
                         LIMIT 5) 
-                    UNION
+                    UNION ALL
                         (
                         SELECT * 
                         FROM ProductsReviews 
@@ -34,7 +34,7 @@ def queryA(cur, asin):
                     ''')
         results = cur.fetchall()
         table = PrettyTable()
-        table.field_names = ["asin", "customer", "date", "rating", "votes", "helpful"]
+        table.field_names = ["id","asin", "customer", "date", "rating", "votes", "helpful"]
         if(len(results)==0):
             print("Nenhum comentário encontrado")
             return

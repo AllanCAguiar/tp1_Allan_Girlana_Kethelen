@@ -12,7 +12,7 @@ outputFile = "resultados.txt"
 
 def writeFile(table,query):
     with open(outputFile, "a") as f:
-        f.write(f"\nResultados da Consulta {query}\n\n")
+        f.write(f"\n\nResultados da Consulta {query}\n\n")
         f.write(str(table))
         f.close()
     
@@ -191,7 +191,7 @@ def queryG(cur):
         for row in results:
             table.add_row(row)
         
-        writeFile(table, 'F')
+        writeFile(table, 'G')
 
     except (Exception, psycopg2.DatabaseError) as error:
         print("Erro ao tentar realizar a consulta G", error)
@@ -199,25 +199,27 @@ def queryG(cur):
 
 
 def showMenu():
-    print("\nEscolha uma opção de Consulta\t")
+    print("----------------------------------------------------------------------------")
+    print("\t\tEscolha uma opção de Consulta\t\t")
+    print("----------------------------------------------------------------------------")
     
-    print("a. Dado um produto, listar os 5 comentários mais úteis e com maior avaliação e os 5 comentários mais úteis e com menor avaliação")
+    print("a. Dado um produto, listar os 5 comentários mais úteis e com maior avaliação e os 5 comentários mais úteis e com menor avaliação\n")
 
-    print("b. Dado um produto, listar os produtos similares com maiores vendas do que ele")
+    print("b. Dado um produto, listar os produtos similares com maiores vendas do que ele\n")
 
-    print("c. Dado um produto, mostrar a evolução diária das médias de avaliação ao longo do intervalo de tempo coberto no arquivo de entrada")
+    print("c. Dado um produto, mostrar a evolução diária das médias de avaliação ao longo do intervalo de tempo coberto no arquivo de entrada\n")
 
-    print("d. Listar os 10 produtos líderes de venda em cada grupo de produtos")
+    print("d. Listar os 10 produtos líderes de venda em cada grupo de produtos\n")
 
-    print("e. Listar os 10 produtos com a maior média de avaliações úteis positivas por produto")
+    print("e. Listar os 10 produtos com a maior média de avaliações úteis positivas por produto\n")
 
-    print("f. Listar a 5 categorias de produto com a maior média de avaliações úteis positivas por produto")
+    print("f. Listar a 5 categorias de produto com a maior média de avaliações úteis positivas por produto\n")
 
-    print("g. Listar os 10 clientes que mais fizeram comentários por grupo de produto")
+    print("g. Listar os 10 clientes que mais fizeram comentários por grupo de produto\n")
 
-    print("l. Limpar o arquivo de saída")
+    print("l. Limpar o arquivo de saída\n")
 
-    print("q. Sair")
+    print("q. Sair\n")
 
 def chooseQuery():
     try:
@@ -235,39 +237,39 @@ def chooseQuery():
     print(f"Os resultados das consultas estarão no arquivo '{outputFile}' ")
     while(True):
         showMenu()
-        option = input("Digite uma opcao de consulta: ")
+        option = input("DIGITE AQUI SUA OPCAO DE CONSULTA: ")
 
-        if (option == 'a'):
-            asin = input("Digite o código ASIN do produto desejado: ")
+        if (option == 'a' or option == 'A'):
+            asin = input("\nDigite o código ASIN do produto desejado: ")
             queryA(cur, asin)
 
-        elif (option == 'b'):
-            asin = input("Digite o código ASIN do produto desejado: ")
+        elif (option == 'b' or option == 'B'):
+            asin = input("\nDigite o código ASIN do produto desejado: ")
             queryB(cur, asin)
 
-        elif (option == 'c'):
-            asin = input("Digite o código ASIN do produto desejado: ")
+        elif (option == 'c' or option == 'C'):
+            asin = input("\nDigite o código ASIN do produto desejado: ")
             queryC(cur, asin)
 
-        elif (option == 'd'):
+        elif (option == 'd' or option == 'D'):
             queryD(cur)
 
-        elif (option == 'e'):
+        elif (option == 'e' or option == 'E'):
             queryE(cur)
 
-        elif (option == 'f'):
+        elif (option == 'f' or option == 'F'):
             queryF(cur)
 
-        elif (option == 'g'):
+        elif (option == 'g' or option == 'G'):
             queryG(cur)
 
-        elif (option == 'q'):
+        elif (option == 'q' or option == 'Q' ):
             sys.exit()
-        elif (option == 'l'):
+        elif (option == 'l' or option == 'L'):
             with open(outputFile, "w") as f:
                 f.close()
         else:   
-            print("Escolha  uma opção válida!!!")  
+            print("\n**************Escolha  uma opção válida!!!**************\n")  
         
  
 

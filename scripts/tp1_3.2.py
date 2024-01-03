@@ -1,6 +1,6 @@
 import psycopg2
 
-#mudar de acordo com as suas informações
+#Mudar de acordo com as suas informações
 host="localhost"
 database="amazon_agk"
 user="postgres"
@@ -16,9 +16,7 @@ def createTables():
             " user=" + user +
             " password=" + password
         )
-
         cur = conn.cursor()
-
         cur.execute('''CREATE TABLE IF NOT EXISTS Products ( 
             ID_product INT NOT NULL UNIQUE,
             ASIN CHAR(10) PRIMARY KEY,
@@ -26,18 +24,15 @@ def createTables():
             group_name VARCHAR(20),
             salesrank INT);''' 
         )
-
         cur.execute('''CREATE TABLE IF NOT EXISTS ProductsSimilar ( 
                     ASIN_initial CHAR(10), 
                     ASIN_similar CHAR(10), 
                     PRIMARY KEY (ASIN_initial, ASIN_similar), 
                     FOREIGN KEY (ASIN_initial) REFERENCES Products(ASIN));''' 
         )
-
         cur.execute('''CREATE TABLE IF NOT EXISTS Categories ( 
                     category_name VARCHAR(250) PRIMARY KEY);'''
         ) 
-
         cur.execute('''CREATE TABLE IF NOT EXISTS ProductsCategories ( 
                     ASIN CHAR(10),
                     category_name VARCHAR(250),
@@ -45,7 +40,6 @@ def createTables():
                     FOREIGN KEY (ASIN) REFERENCES Products(ASIN),
                     FOREIGN KEY (category_name) REFERENCES Categories(category_name));'''
         )
-
         cur.execute('''CREATE TABLE IF NOT EXISTS ProductsReviews (
                     reviewID SERIAL PRIMARY KEY,
                     ASIN CHAR(10),
@@ -57,51 +51,52 @@ def createTables():
                     FOREIGN KEY (ASIN) REFERENCES Products(ASIN));'''
         )
         conn.commit()
-
     except (Exception, psycopg2.DatabaseError) as error:
         print ("Erro ao tentar criar tabelas", error)
-
+        exit()
     if(conn):
         cur.close()
         conn.close()
-        print("Tabelas criadas")
-
+    print("Tabelas criadas")
     
 def insertCategories(cur, category):
     try:
-        cur.execute("INSERT INTO Categories(category_name) VALUES (%s) ON CONFLICT (category_name) DO NOTHING;", (category,))
+        cur.execute(f'''INSERT INTO Categories(category_name) VALUES (%s) ON CONFLICT (category_name) DO NOTHING;''', (category,))
     except (Exception, psycopg2.DatabaseError) as error:
         print("Erro ao tentar inserir na tabela Categories", error)
+        exit()
 
 def insertProductsCategories(cur, ASIN, category):
     try:
-        cur.execute("INSERT INTO ProductsCategories(ASIN, category_name) VALUES (%s, %s) ON CONFLICT (ASIN, category_name) DO NOTHING;", (ASIN, category,))
+        cur.execute(f'''INSERT INTO ProductsCategories(ASIN, category_name) VALUES ('{ASIN}', %s) ;''', (category,))
     except (Exception, psycopg2.DatabaseError) as error:
         print("Erro ao tentar inserir na tabela ProductsCategories", error)
+        exit()
     
 def insertProducts(cur, ID, ASIN, title, group_name, salesrank):
     try:
-        cur.execute("INSERT INTO Products(ID_product, ASIN, title, group_name, salesrank) VALUES (%s, %s, %s, %s, %s) ON CONFLICT (ASIN) DO NOTHING;", 
-                (ID, ASIN, title, group_name, salesrank,))
+        cur.execute(f'''INSERT INTO Products(ID_product, ASIN, title, group_name, salesrank) VALUES ({ID}, '{ASIN}', %s, '{group_name}', %s);''', (title, salesrank))
     except (Exception, psycopg2.DatabaseError) as error:
         print("Erro ao tentar inserir na tabela Products", error)
+        exit()
     
-def insertProductsReviews(cur, ASIN, costumer, date, rating, votes, helpful):
+def insertProductsReviews(cur, ASIN, customer, date, rating, votes, helpful):
     try:
-        cur.execute("INSERT INTO ProductsReviews(ASIN, customer, date, rating, votes, helpful) VALUES (%s, %s, %s, %s, %s, %s);", 
-                (ASIN, costumer, date, rating, votes, helpful,))
+        cur.execute(f'''INSERT INTO ProductsReviews(ASIN, customer, date, rating, votes, helpful) VALUES ('{ASIN}', '{customer}', '{date}', '{rating}', '{votes}', '{helpful}');''')
     except (Exception, psycopg2.DatabaseError) as error:
         print("Erro ao tentar inserir na tabela ProductsReviews", error)
+        exit()
     
 def insertProductsSimilar(conn, cur, ASIN_initial, ASIN_similar):
     try:
-        cur.execute("INSERT INTO ProductsSimilar(ASIN_initial, ASIN_similar) VALUES (%s, %s) ON CONFLICT (ASIN_initial, ASIN_similar) DO NOTHING;", 
-                (ASIN_initial, ASIN_similar,))
+        cur.execute(f'''INSERT INTO ProductsSimilar(ASIN_initial, ASIN_similar) VALUES ('{ASIN_initial}', '{ASIN_similar}') ON CONFLICT (ASIN_initial, ASIN_similar) DO NOTHING;''')
     except psycopg2.IntegrityError:
         conn.rollback()
     except (Exception, psycopg2.DatabaseError) as error:
         print("Erro ao tentar inserir na tabela ProductsSimilar", error)
+        exit()
     conn.commit()
+
 def readFile():
     try:
         print("Conectando com o PostgreSQL...")
@@ -117,7 +112,6 @@ def readFile():
     print("Conexão com o PostgreSQL efetivada")
     similares = []
     print('Lendo arquivo de entrada...')
-    cont=0
     with open(inputFile) as f:
         #Pula o cabeçario
         f.readline()
@@ -137,7 +131,6 @@ def readFile():
                 ASIN = ''
                 f.readline()
             else:
-                #print(ASIN)
                 line = line[1:]
                 title=' '.join(line)
                 #Ler grupo
@@ -166,11 +159,8 @@ def readFile():
                 #Ler avaliações
                 line = f.readline().split()
                 for i in range(int(line[4])):
-                    #cont+=1
                     review = f.readline().split()
                     insertProductsReviews(cur, ASIN, review[2], review[0], review[4], review[6], review[8])
-                #print(cont)
-                cont=0
                 f.readline()
     f.close()
     print("Leitura Concluida")
@@ -178,12 +168,10 @@ def readFile():
     for item in similares:
         insertProductsSimilar(conn, cur, item[0], item[1])
     conn.commit()
-    print("Produtos similares inseridos")
     if(conn):
         cur.close()
         conn.close()
-
-
+    print("Produtos similares inseridos")
 
 if __name__ == '__main__':
    createTables()

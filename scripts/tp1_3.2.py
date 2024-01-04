@@ -4,7 +4,7 @@ import psycopg2
 host="localhost"
 database="amazon_agk"
 user="postgres"
-password="postgres"
+password="12345"
 inputFile = "../postgres-data/amazon-meta.txt"
 
 def createTables():

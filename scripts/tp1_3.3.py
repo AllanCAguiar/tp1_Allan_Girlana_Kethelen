@@ -5,7 +5,7 @@ from prettytable import PrettyTable
 host="localhost"
 database="amazon_agk"
 user="postgres"
-password="postgres"
+password="12345"
 outputFile = "resultados.txt"
 
 def writeFile(table,query):
@@ -24,7 +24,7 @@ def queryA(cur, asin):
                         LIMIT 5) 
                     UNION ALL
                         (
-                        SELECT * 
+                        SELECT * -
                         FROM ProductsReviews 
                         WHERE asin = '{asin}'
                         ORDER BY  rating ASC, helpful DESC
@@ -68,13 +68,14 @@ def queryB(cur, asin):
         for row in results:
             table.add_row(row)
         writeFile(table, f'B para o código {asin}')
+        
     except (Exception, psycopg2.DatabaseError) as error:
         print("Erro ao tentar realizar a consulta B", error)
 
 
 def queryC(cur, asin):
     try:
-        cur.execute(f'''SELECT DISTINCT date, ROUND(AVG(rating) OVER (PARTITION BY asin ORDER BY date),2) 
+        cur.execute(f'''SELECT DISTINCT date, ROUND(AVG(rating) OVER (PARTITION BY date ORDER BY date),2) 
                         FROM ProductsReviews 
                         WHERE ASIN = '{asin}'
                         ORDER BY date;

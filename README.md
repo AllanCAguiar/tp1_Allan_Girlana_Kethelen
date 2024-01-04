@@ -1,7 +1,13 @@
-# Repositorio Base
+
 # Trabalho Prático 1 de Bancos de Dados I 
 
 Os detalhes sobre o trablho prático estão disponíveis [aqui](https://docs.google.com/document/d/1CXf_y392fJ_KNTZbdr5TWSRgEuYXFPyGTJOh4DcqOdA/edit): 
+
+## Alunos
+
+    Allan Carvalho de Aguiar    22153696
+    Girlana Souza               22152263
+    Kethelen do Carmo Souza     22152253
 
 ## Copiando esse repositorio
 
@@ -68,8 +74,8 @@ password: postgres
 
 ## Usando Python
 
-Para instalar bibliotecas necessarias para o trabalho, use o pip [DEPOIS de ativar o ambiente](#python) virtual.
+Para instalar bibliotecas necessarias para o trabalho, execute o script [DEPOIS de ativar o ambiente](#python) virtual.
 
 ```bash
-pip install <biblioteca>
+bash bib.sh
 ```

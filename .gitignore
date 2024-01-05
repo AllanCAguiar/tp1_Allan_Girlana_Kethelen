@@ -132,4 +132,4 @@ dmypy.json
 postgres-data/
 .tp1/
 output/*
-!output/exemplos.txt
+!output/.gitkeep

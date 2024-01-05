@@ -131,4 +131,5 @@ dmypy.json
 # local folders
 postgres-data/
 .tp1/
-scripts/resultados.txt
+output/*
+!output/exemplos.txt

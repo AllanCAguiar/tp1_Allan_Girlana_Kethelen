@@ -5,8 +5,8 @@ from prettytable import PrettyTable
 host="localhost"
 database="amazon_agk"
 user="postgres"
-password="12345"
-outputFile = "resultados.txt"
+password="postgres"
+outputFile = "../output/resultados.txt"
 
 def writeFile(table,query):
     with open(outputFile, "a") as f:
